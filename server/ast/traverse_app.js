@@ -93,6 +93,7 @@ const getFilePromisified = (filePath) => {
     console.log(arrowExpressions[0]);
   }
 
+  // recursive function to get nested children
   function returnChildComponents(children) {
     let elemNames = [];
     children.forEach(child => {

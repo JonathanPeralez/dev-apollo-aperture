@@ -28,6 +28,7 @@
     "file-loader": "^3.0.1",
     "flexboxgrid": "^6.3.1",
     "font-awesome": "^4.7.0",
+    "formidable": "^1.2.1",
     "glob": "^7.1.4",
     "graphql": "^14.3.0",
     "graphql-tag": "^2.10.1",

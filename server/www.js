@@ -3,70 +3,102 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const cors = require('cors')
-const multer = require('multer') // File handler
+const cors = require('cors');
+const multer = require('multer'); // File handler
+const formidable = require('formidable');
+const fs = require('fs');
+const getFile = require('./ast/getFiles');
+const glob = require('glob');
 
-const www = express();
-www.use(bodyParser.urlencoded({extended: true}));
-www.use(bodyParser.json());
-www.use(cookieParser());
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cookieParser());
 
 // const corsOptions = {
 //   origin: '*',
 //   optionsSuccessStatus: 200,
 // };
 
-www.use(cors());
+app.use(cors());
 
-let storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-  cb(null, 'public')
-},
-filename: function (req, file, cb) {
-  cb(null, Date.now() + '-' +file.originalname )
-}
-})
-
-let upload = multer({ storage: storage }).single('file');
-
-www.post('/upload',function(req, res) {
-     
-  upload(req, res, function (err) {
-         if (err instanceof multer.MulterError) {
-             return res.status(500).json(err)
-         } else if (err) {
-             return res.status(500).json(err)
-         }
-    return res.status(200).send(req.file)
-
-  })
-
+    cb(null, 'uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now())
+  }
 });
 
+// filename: function (req, file, cb) {
+//   cb(null, Date.now() + '-' +file.originalname )
+// }
 
-//routes
-const productRoute = require('../routes/productRoute.js');
+// let upload = multer({ storage: storage }).single('file');
+const upload = multer({storage});
 
+/*app.post('/api/upload', upload.single('test'), (req, res, next) => {
+  /!*const file = req.file;
+  if (!file) {
+    console.log('err');
+  }*!/
+  console.log('ran');
+});*/
 
-www.get('/', (req, res)=>{
+app.post('/api/upload', (req, res) => {
+  new formidable.IncomingForm().parse(req, (err, fields, files) => {
+    if (err) console.log(err);
+    console.log(files);
+    const filePath = path.join(__dirname, 'uploads');
+    fs.writeFileSync()
+  })
+})
+
+// app.post('/upload',function(req, res) {
+//   upload(req, res, function (err) {
+//          if (err instanceof multer.MulterError) {
+//              return res.status(500).json(err)
+//          } else if (err) {
+//              return res.status(500).json(err)
+//          }
+//     return res.status(200).send(req.file)
+//
+//   })
+// });
+// });
+
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-www.use(bodyParser.urlencoded({extended: true}));
-www.use(bodyParser.json());
-www.use(cookieParser())
-
-
-// www.use('/build', express.static(path.join(__dirname, '../build')));
-www.use('/api', productRoute);
-
-www.use('/', (req, res) => {
- // res.sendFile(path.join(__dirname, '../index.html'));
-  res.send('reached root route');
+app.listen(3000, () => {
+  console.log('Server listening on Port 3000')
 });
 
-www.listen(8000, () => {
-  console.log('Server listening on Port 8000')
-})
+function processAST(file) {
+  return new Promise((resolve, reject) => {
+    getFile.fileToUpload(file)
+      .then(data => {
+        console.log('got data', data);
+        resolve(data);
+      })
+      .catch(err => {
+        console.log('received err', err);
+        reject(err);
+      });
+  });
+}
 
-module.exports = www;
+const pathName = path.join(__dirname, '..', 'server', 'samples', 'todo', 'App.js');
+fs.readFile(pathName, 'utf8', (err, file) => {
+  /*getFile.fileToUpload(file)
+    .then(data => {
+      console.log('got data', data);
+    })
+    .catch(err => {
+      console.log('received err', err);
+    });*/
+});
+
+module.exports = app;

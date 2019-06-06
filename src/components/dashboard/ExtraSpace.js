@@ -47,7 +47,7 @@ class ExtraSpace extends React.Component{
   onClickHandler() {
     const data = new FormData() 
     data.append('file', this.state.selectedFile)
-      axios.post("http://localhost:8000/upload", data, { // receive two parameter endpoint url ,form data 
+      axios.post("http://localhost:3000/api/upload", data, { // receive two parameter endpoint url ,form data
     })
     .then(res => { // then print response status
       console.log(res.statusText)
