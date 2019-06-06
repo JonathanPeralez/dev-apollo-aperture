@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const multer = require('multer'); // File handler
 const formidable = require('formidable');
+// const formidableMiddleware = require('express-formidable');
 const fs = require('fs');
 const getFile = require('./ast/getFiles');
 const glob = require('glob');
@@ -46,27 +47,30 @@ const upload = multer({storage});
   console.log('ran');
 });*/
 
-app.post('/api/upload', (req, res) => {
-  new formidable.IncomingForm().parse(req, (err, fields, files) => {
-    if (err) console.log(err);
-    console.log(files);
-    const filePath = path.join(__dirname, 'uploads');
-    fs.writeFileSync()
-  })
-})
+app.get('/api/d3json', (req, res) => {
+  const filePath = path.join(__dirname, 'uploads', 'App.js');
+  fs.readFile(filePath, 'utf8', (err, file) => {
+    processAST(file)
+      .then(data => {
+        res.json(data);
+      });
+  });
+});
 
-// app.post('/upload',function(req, res) {
-//   upload(req, res, function (err) {
-//          if (err instanceof multer.MulterError) {
-//              return res.status(500).json(err)
-//          } else if (err) {
-//              return res.status(500).json(err)
-//          }
-//     return res.status(200).send(req.file)
-//
-//   })
-// });
-// });
+app.post('/api/upload', (req, res) => {
+  const form = new formidable.IncomingForm();
+
+  form.parse(req);
+
+  form.on('fileBegin', function (name, file){
+    file.path = __dirname + '/uploads/' + file.name;
+  });
+
+  form.on('file', function (name, file){
+    console.log('Uploaded ' + file.name);
+  });
+  res.send('file uploaded');
+});
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -80,7 +84,7 @@ function processAST(file) {
   return new Promise((resolve, reject) => {
     getFile.fileToUpload(file)
       .then(data => {
-        console.log('got data', data);
+        // console.log('got data', data);
         resolve(data);
       })
       .catch(err => {
@@ -92,13 +96,13 @@ function processAST(file) {
 
 const pathName = path.join(__dirname, '..', 'server', 'samples', 'todo', 'App.js');
 fs.readFile(pathName, 'utf8', (err, file) => {
-  /*getFile.fileToUpload(file)
+  getFile.fileToUpload(file)
     .then(data => {
       console.log('got data', data);
     })
     .catch(err => {
       console.log('received err', err);
-    });*/
+    });
 });
 
 module.exports = app;

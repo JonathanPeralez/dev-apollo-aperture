@@ -24,7 +24,7 @@ class QueryTree extends Component {
 
     const theTree = d3.tree()
       .size([600, 700]);
-    d3.json('./sample.json')
+    d3.json('http://localhost:3000/api/d3json')
       .then(data => {
         const root = d3.hierarchy(data);
         const links = theTree(root).links();

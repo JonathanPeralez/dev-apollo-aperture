@@ -33,7 +33,7 @@ function HierarchyConstructor() {
 }
 
 HierarchyConstructor.prototype.addChildren = function(componentName) {
-  this.children.push(componentName);
+  this.children.push({name: componentName});
 };
 
 OriginalHierarchyConstructor.prototype.addComponent = function(componentName){
