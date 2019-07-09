@@ -94,7 +94,7 @@ function processAST(file) {
   });
 }
 
-const pathName = path.join(__dirname, '..', 'server', 'samples', 'todo', 'App.js');
+/*const pathName = path.join(__dirname, '..', 'server', 'samples', 'todo', 'App.js');
 fs.readFile(pathName, 'utf8', (err, file) => {
   getFile.fileToUpload(file)
     .then(data => {
@@ -103,6 +103,6 @@ fs.readFile(pathName, 'utf8', (err, file) => {
     .catch(err => {
       console.log('received err', err);
     });
-});
+});*/
 
 module.exports = app;
